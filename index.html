@@ -42,8 +42,8 @@ function loadDoc() {
             cardList = cardList.concat(responseText.data);
 
             // debug info
-            console.log("parsed responseText:");
-            console.log(responseText);
+            // console.log("parsed responseText:");
+            // console.log(responseText);
 
             // if there are more pages of cards, post new request and return
             if (responseText.has_more) {
@@ -53,8 +53,9 @@ function loadDoc() {
                 return;
             }
 
-            // cards to display
+            // number of cards to display
             let i_max = document.getElementById("displayCnt").value
+            // html to be rendered
             let output = "";
 
             // render the requested number of commanders
@@ -64,12 +65,13 @@ function loadDoc() {
                 let idx = Math.floor(Math.random() * cardList.length);
                 
                 // add to HTML being rendered
-                // if MDFC just do front face, who cares
+                // if we can't find the image URI check for MDFC
+                // if that doesn't work either give up and log to console
                 try {
-                    if (cardList[idx].card_faces) {
-                        output += "<img src=" + cardList[idx].card_faces[0].image_uris.normal + "> ";
-                    } else {
+                    if (cardList[idx].image_uris) {
                         output += "<img src=" + cardList[idx].image_uris.normal + "> ";
+                    } else {
+                        output += "<img src=" + cardList[idx].card_faces[0].image_uris.normal + "> ";
                     }
                 } catch (err) {
                     console.log("failed to get URI for card " + cardList[idx].name);
@@ -100,19 +102,6 @@ function loadDoc() {
     xhttp.send();
 }
 
-
-/**
- * on request response
- * if more pages after this {
- *  add list contents to global list and query the next list, then return
- * } if this is the last list {
- *  and contents and then select from global list
- * }
- */
-
-
 </script>
 </body>
 </html>
-
-<!-- ????????????? firefox makes up its own paths for the documents and will not accept normal local paths. this is probably unstable -->
