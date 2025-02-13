@@ -1,0 +1,2 @@
+- rate limit to ~10 requests per second
+- encodeURI or encodeURIComponent for str to URI in js

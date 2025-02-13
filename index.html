@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>RANDOMANDER</h1>
+    <p>A customizable & filterable random commander generator for Magic: the Gathering</p>
+    
+    <form>
+            <label for="filter">Filters (scryfall search syntax): </label><br>
+            <input type="text" id="filter" name="filter"><br>
+            <label for="displayCnt">Max cards to display at once: </label>
+            <input type="number" id="displayCnt" name="displayCnt" min="1" max="50" value="5"><br>
+    </form>
+
+    <button type="button" onclick="loadDoc()">Get Commanders</button>
+    <div id="outputDiv"></div>
+<script>
+
+var cardList = [];
+
+function loadDoc() {
+    // clear global card list from last iteration
+    cardList = [];
+    // new https request
+    var xhttp = new XMLHttpRequest();
+
+    // when our request is returned
+    xhttp.onreadystatechange = function() {
+        // if we got a resposne
+        if (this.readyState == 4) {
+            // on bad status, throw error and exit
+            if (this.status == 404) {
+                document.getElementById("outputDiv").innerHTML="<p>" + this.status + " no results :(</p>";
+                return;
+            // any other non-OK status
+            } else if (this.status != 200) {
+                document.getElementById("outputDiv").innerHTML="<p>" + this.status + " query error :(</p>";
+                return; 
+            }
+
+            let responseText = JSON.parse(this.responseText);
+            // add returned cards to global list
+            cardList = cardList.concat(responseText.data);
+
+            // debug info
+            console.log("parsed responseText:");
+            console.log(responseText);
+
+            // if there are more pages of cards, post new request and return
+            if (responseText.has_more) {
+                xhttp.open("GET", responseText.next_page, true);
+                xhttp.send();
+                console.log(cardList.length + " cards...");
+                return;
+            }
+
+            // cards to display
+            let i_max = document.getElementById("displayCnt").value
+            let output = "";
+
+            // render the requested number of commanders
+            for(let i = 0; i < i_max; i++) {
+            
+                // random index in bounds
+                let idx = Math.floor(Math.random() * cardList.length);
+                
+                // add to HTML being rendered
+                // if MDFC just do front face, who cares
+                try {
+                    if (cardList[idx].card_faces) {
+                        output += "<img src=" + cardList[idx].card_faces[0].image_uris.normal + "> ";
+                    } else {
+                        output += "<img src=" + cardList[idx].image_uris.normal + "> ";
+                    }
+                } catch (err) {
+                    console.log("failed to get URI for card " + cardList[idx].name);
+                }
+                // remove card from list for future iterations
+                cardList.splice(idx, 1);
+                // if the list is empty now, break
+                if (cardList.length == 0) break;
+
+            }
+            // render cards
+            document.getElementById("outputDiv").innerHTML=output;
+
+
+        // no response yet
+        } else {
+            // put notification in empty div
+            document.getElementById("outputDiv").innerHTML="<p>Working...</p>";
+        }
+    };
+
+    // build request from inputs and commanders only
+    let filter = encodeURIComponent(document.getElementById("filter").value + " t:creature t:legendary legal:commander");
+    // console.log(filter);
+
+    // send request to scryfall
+    xhttp.open("GET", "https://api.scryfall.com/cards/search?q=" + filter, true);
+    xhttp.send();
+}
+
+
+/**
+ * on request response
+ * if more pages after this {
+ *  add list contents to global list and query the next list, then return
+ * } if this is the last list {
+ *  and contents and then select from global list
+ * }
+ */
+
+
+</script>
+</body>
+</html>
+
+<!-- ????????????? firefox makes up its own paths for the documents and will not accept normal local paths. this is probably unstable -->
