@@ -6,6 +6,7 @@
         h1 {text-align: center; font-size: 4em; margin:0em;}
         h3 {text-align: center; font-size: 1.5em; margin-bottom: 3em;}
         form {font-size: 1.5em;}
+
         #top {
             background-color: #2E7D32;
             text-align: center;
@@ -18,6 +19,7 @@
             text-align: center;
             max-width:100vw;
             color: white;
+            min-height: 28vw;
         }
         #filter {
             font-family: "Courier New";
@@ -30,6 +32,11 @@
         #loadDocButton {
             font-size: 0.75em;
         }
+        #footerDiv {
+            background-color: #2E7D32;
+            max-width:100vw;
+            text-align:center;
+        }
 
     </style>
     <title>Randomander - A customizable random commander generator for MTG</title>
@@ -41,7 +48,7 @@
         <h3>A customizable random commander generator for Magic: the Gathering</h3>
 
         <form>
-            <label for="filter">Filters (scryfall search syntax): </label><br>
+            <label for="filter">Filters (Scryfall search syntax): </label><br>
             <input type="text" id="filter" name="filter" size="50" placeholder="mv=4 o:draw" oninput="filterUpdate()">
             <br><br>
             <label for="displayCnt">Cards per search: </label>
@@ -55,6 +62,11 @@
     </div>
     <br>
     <div id="outputDiv"></div>
+    <div id="footerDiv">
+        <p>by Emery<br>
+        <a href="https://github.com/boltmarrow/randomander">view source code</a><br>
+        powered by <a href="https://scryfall.com">Scryfall</a> API and card images</p>
+    </div>
 <script>
 
 // global list of cards to pick commanders from (for use across async API requests)

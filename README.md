@@ -1,2 +1,3 @@
 # randomander
-A customizable commander generating app for Magic: the Gathering
+A customizable commander generating web app for Magic: the Gathering
+usable at https://boltmarrow.github.io/randomander/
