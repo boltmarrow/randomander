@@ -87,18 +87,24 @@ function loadDoc() {
             
                 // random index in bounds
                 let idx = Math.floor(Math.random() * cardList.length);
-                
-                // add to HTML being rendered
+                // image of current card to be displayed
+                let currImg;
                 // if we can't find the image URI check for MDFC
-                // if that doesn't work either give up and log to console
+                // if that doesn't work either give up (throw err)
                 try {
                     if (cardList[idx].image_uris) {
-                        output += "<img src=" + cardList[idx].image_uris.normal + "> ";
+                        currImg = cardList[idx].image_uris.normal;
                     } else {
-                        output += "<img src=" + cardList[idx].card_faces[0].image_uris.normal + "> ";
+                        currImg = cardList[idx].card_faces[0].image_uris.normal;
                     }
+                    // add to HTML being rendered
+                    output += `
+                        <a href=${cardList[idx].scryfall_uri} target="_blank">
+                            <img src=${currImg} alt=${cardList[idx].name}>
+                        </a>
+                    `
                 } catch (err) {
-                    console.log("failed to get URI for card " + cardList[idx].name);
+                    console.log("failed to get info for card " + cardList[idx].name);
                 }
                 // remove card from list for future iterations
                 cardList.splice(idx, 1);
