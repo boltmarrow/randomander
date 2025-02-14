@@ -15,7 +15,13 @@
     <div id="outputDiv"></div>
 <script>
 
+// global list of cards to pick commanders from (for use across async API requests)
 var cardList = [];
+
+// display some html in the output div
+function outputHTML(out) {
+    document.getElementById("outputDiv").innerHTML = out;
+}
 
 function loadDoc() {
     // clear global card list from last iteration
@@ -29,11 +35,11 @@ function loadDoc() {
         if (this.readyState == 4) {
             // on bad status, throw error and exit
             if (this.status == 404) {
-                document.getElementById("outputDiv").innerHTML="<p>" + this.status + " no results :(</p>";
+                outputHTML("<p>" + this.status + " no results :(</p>");
                 return;
             // any other non-OK status
             } else if (this.status != 200) {
-                document.getElementById("outputDiv").innerHTML="<p>" + this.status + " query error :(</p>";
+                outputHTML("<p>" + this.status + " query error :(</p>");
                 return; 
             }
 
@@ -49,7 +55,9 @@ function loadDoc() {
             if (responseText.has_more) {
                 xhttp.open("GET", responseText.next_page, true);
                 xhttp.send();
-                console.log(cardList.length + " cards...");
+                // show progress to user
+                outputHTML(`Loaded ${cardList.length} of ${responseText.total_cards} cards...`);
+
                 return;
             }
 
@@ -83,23 +91,23 @@ function loadDoc() {
 
             }
             // render cards
-            document.getElementById("outputDiv").innerHTML=output;
+            outputHTML(output);
 
 
         // no response yet
         } else {
-            // put notification in empty div
-            document.getElementById("outputDiv").innerHTML="<p>Working...</p>";
         }
     };
 
     // build request from inputs and commanders only
-    let filter = encodeURIComponent(document.getElementById("filter").value + " t:creature t:legendary legal:commander");
+    let filter = encodeURIComponent(document.getElementById("filter").value + " is:commander legal:commander");
     // console.log(filter);
 
     // send request to scryfall
     xhttp.open("GET", "https://api.scryfall.com/cards/search?q=" + filter, true);
     xhttp.send();
+    // put notification in output div
+    outputHTML("<p>Working...</p>");
 }
 
 </script>
