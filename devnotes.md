@@ -1,8 +1,14 @@
 - rate limit to ~10 requests per second
-- encodeURI or encodeURIComponent for str to URI in js
 ### TODO
 - make it pretty
-    - more info on load times
     - put some CSS on that bad buoy
 - more filters
     - top or bottom X% of edhrec popularity
+    - stuff scryfall search doesn't offer
+- changing the filter as a query runs could have some strange effects but nothing site-breaking i think....
+- let user cancel search (sometimes you notice a typo during a long search or something)
+- would be faster to send all API requests after the first at once. oh well!
+- get/reroll dichotomy not great bc more than just the last search is cached
+- whole site could stand to be state-ified for cleanliness
+- could also just keep all legal commanders in the site data and filter them locally
+    - faster but way more complicated, we'd have to decode scryfall syntax

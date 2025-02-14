@@ -6,21 +6,37 @@
     
     <form>
             <label for="filter">Filters (scryfall search syntax): </label><br>
-            <input type="text" id="filter" name="filter"><br>
+            <input type="text" id="filter" name="filter" placeholder="mv=4 o:draw" oninput="filterUpdate()"><br>
             <label for="displayCnt">Max cards to display at once: </label>
             <input type="number" id="displayCnt" name="displayCnt" min="1" max="50" value="5"><br>
     </form>
 
-    <button type="button" onclick="loadDoc()">Get Commanders</button>
+    <button type="button" id="loadDocButton" onclick="loadDoc()">Get Commanders</button>
     <div id="outputDiv"></div>
 <script>
 
 // global list of cards to pick commanders from (for use across async API requests)
 var cardList = [];
+// global var to track last searched filter
+var lastFilter = "";
 
 // display some html in the output div
 function outputHTML(out) {
     document.getElementById("outputDiv").innerHTML = out;
+}
+// updates the form when the filter is changed to signal slower loading times (requests cached are filter-specific)
+function filterUpdate() {
+    let out;
+    if (document.getElementById("filter").value == lastFilter) {
+        // filter hasn't changed from last search
+        out = "Reroll Commanders (same filter)";
+        console.log(`same`);
+    } else {
+        out = "Get Commanders";
+        console.log(`diff is prev "${lastFilter}", now "${document.getElementById("filter").value}"`);
+    }
+
+    document.getElementById("loadDocButton").innerHTML = out;
 }
 
 function loadDoc() {
@@ -35,11 +51,11 @@ function loadDoc() {
         if (this.readyState == 4) {
             // on bad status, throw error and exit
             if (this.status == 404) {
-                outputHTML("<p>" + this.status + " no results :(</p>");
+                outputHTML(`<p>No results :(</p>`);
                 return;
             // any other non-OK status
             } else if (this.status != 200) {
-                outputHTML("<p>" + this.status + " query error :(</p>");
+                outputHTML(`<p>${this.status} query error :(</p>`);
                 return; 
             }
 
@@ -92,10 +108,6 @@ function loadDoc() {
             }
             // render cards
             outputHTML(output);
-
-
-        // no response yet
-        } else {
         }
     };
 
@@ -108,6 +120,10 @@ function loadDoc() {
     xhttp.send();
     // put notification in output div
     outputHTML("<p>Working...</p>");
+    // update last used filter
+    lastFilter = document.getElementById("filter").value // not the part we secretly append
+    // simulate filter update
+    filterUpdate();
 }
 
 </script>
